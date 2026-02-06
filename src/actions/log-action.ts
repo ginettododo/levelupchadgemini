@@ -111,5 +111,33 @@ export async function logAction(actionKey: string, clientId: string) {
     // or we add the RPC call to queries.ts to sum it up.
 
     revalidatePath('/today')
+
+    // 5. Background Checks (Quests & Achievements)
+    // We fetch events again with join for evaluateQuestProgress
+    const { data: todayEvents } = await supabase
+        .from('event_log')
+        .select('*, actions(key, category)')
+        .eq('user_id', user.id)
+        .eq('day_key', today)
+
+    if (todayEvents) {
+        const { checkQuestCompletion } = await import('@/lib/game/quests')
+        const { checkAchievements, ACHIEVEMENTS } = await import('@/lib/game/achievements')
+        const { calculateLevel } = await import('@/lib/game/mechanics')
+
+        await checkQuestCompletion(supabase, user.id, todayEvents)
+
+        // For achievements, we need current stats
+        const { data: stats } = await supabase.rpc('get_user_stats', { target_user_id: user.id })
+        const totalXP = stats?.total_xp || 0
+        const levelData = calculateLevel(totalXP)
+
+        await checkAchievements(supabase, user.id, {
+            totalActions: stats?.total_actions || 0,
+            streak,
+            level: levelData.level
+        })
+    }
+
     return { success: true }
 }

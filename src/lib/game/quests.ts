@@ -147,3 +147,29 @@ export function evaluateQuestProgress(quest: { rules: any }, events: GameEvent[]
         target
     }
 }
+
+/**
+ * Checks all active quests for completion and marks them done.
+ */
+export async function checkQuestCompletion(supabase: SupabaseClient, userId: string, events: any[]) {
+    // 1. Fetch active quests
+    const { data: quests } = await supabase
+        .from('quests')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+
+    if (!quests) return
+
+    for (const quest of quests) {
+        // Transform events to match GameEvent if needed or just pass directly
+        const { progress } = evaluateQuestProgress(quest, events)
+        if (progress >= 100) {
+            await supabase
+                .from('quests')
+                .update({ status: 'done' })
+                .eq('id', quest.id)
+        }
+    }
+}
+

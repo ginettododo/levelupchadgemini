@@ -8,6 +8,8 @@ export type DaySummary = {
     level: number
     xpProgress: number
     xpToNext: number
+    walletBalance: number
+    rank: string
     actionsToday: Record<string, number> // actionKey -> count
     history: any[]
 }
@@ -118,15 +120,24 @@ export async function getDaySummary(
     const { data: stats } = await supabase.rpc('get_user_stats', { target_user_id: userId })
     // Fallback if RPC not made yet
     const totalXP = stats?.total_xp || 0
-    const levelStats = calculateLevel(totalXP, profile?.xp_k || 10)
+    const levelStats = calculateLevel(totalXP, profile?.level_scale || 10)
+
+    // Determine Rank
+    let rank = 'Novice'
+    if (levelStats.level >= 50) rank = 'Giga Chad'
+    else if (levelStats.level >= 30) rank = 'Elite'
+    else if (levelStats.level >= 20) rank = 'Disciplined'
+    else if (levelStats.level >= 10) rank = 'Grinder'
 
     return {
         xpToday,
         coinsToday,
         streak,
         level: levelStats.level,
-        xpProgress: levelStats.percent,
+        xpProgress: levelStats.progress,
         xpToNext: levelStats.totalToNext,
+        walletBalance: wallet?.coins_balance || 0,
+        rank,
         actionsToday,
         history: events
     }

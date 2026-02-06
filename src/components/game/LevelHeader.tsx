@@ -15,13 +15,13 @@ export function LevelHeader({ summary }: { summary: any }) {
                         </div>
                         <div>
                             <h2 className="text-lg font-bold text-white leading-none mb-1">Level {summary.level}</h2>
-                            <span className="text-xs text-indigo-300 font-mono">Rank: Novice</span>
+                            <span className="text-xs text-indigo-300 font-mono">Rank: {summary.rank}</span>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2 bg-black/30 px-3 py-1.5 rounded-full border border-white/5">
                         <Coins className="w-4 h-4 text-yellow-500" />
-                        <span className="text-sm font-bold text-yellow-100">{summary.coinsToday + 50 /* mock wallet */}</span>
+                        <span className="text-sm font-bold text-yellow-100">{summary.walletBalance}</span>
                     </div>
                 </div>
 

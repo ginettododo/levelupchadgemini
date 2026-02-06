@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
-    "db:seed": "tsx scripts/seed-actions.ts"
+    "db:seed": "tsx scripts/seed-actions.ts",
+    "db:seed:achievements": "tsx scripts/seed-achievements.ts",
+    "db:push": "supabase db push",
+    "db:link": "supabase link"
   },
   "dependencies": {
     "@radix-ui/react-progress": "^1.1.8",
