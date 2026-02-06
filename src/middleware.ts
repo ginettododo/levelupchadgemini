@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { type NextRequest } from 'next/server'
 import { updateSession } from './lib/supabase/middleware'
 

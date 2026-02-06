@@ -8,7 +8,7 @@ export default async function StatsPage() {
     // Fetch aggregate data
     const { data: entries } = await supabase
         .from('event_log')
-        .select('day_key, value, actions(category)')
+        .select('day_key, value, ts, actions(category)')
         .eq('user_id', user?.id)
         .gt('day_key', new Date(Date.now() - 30 * 86400 * 1000).toISOString())
         .order('day_key', { ascending: true })
@@ -18,11 +18,20 @@ export default async function StatsPage() {
     const dailyActivity: Record<string, number> = {}
 
     entries?.forEach((e: any) => {
-        if (e.actions?.category) {
-            categoryCounts[e.actions.category as keyof typeof categoryCounts]++
+        // Handle Supabase join which might occur as array or object depending on types
+        const actionData = Array.isArray(e.actions) ? e.actions[0] : e.actions
+
+        if (actionData?.category) {
+            const cat = actionData.category as keyof typeof categoryCounts
+            if (categoryCounts[cat] !== undefined) {
+                categoryCounts[cat]++
+            }
         }
-        const day = e.day_key || e.ts.split('T')[0]
-        dailyActivity[day] = (dailyActivity[day] || 0) + 1
+        // Fallback or use ts
+        const day = e.day_key || (e.ts ? e.ts.split('T')[0] : '')
+        if (day) {
+            dailyActivity[day] = (dailyActivity[day] || 0) + 1
+        }
     })
 
     const totalActions = (entries?.length || 0)

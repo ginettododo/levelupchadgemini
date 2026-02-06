@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { evaluateQuestProgress } from '../src/lib/game/quests'
 
 describe('Quest Logic', () => {
@@ -6,9 +6,9 @@ describe('Quest Logic', () => {
         it('calculates progress by actionKey', () => {
             const quest = { rules: { actionKey: 'test_action', count: 5 } }
             const events = [
-                { actions: { key: 'test_action' } },
-                { actions: { key: 'test_action' } },
-                { actions: { key: 'other_action' } },
+                { actions: { key: 'test_action', category: '' } },
+                { actions: { key: 'test_action', category: '' } },
+                { actions: { key: 'other_action', category: '' } },
             ]
             const res = evaluateQuestProgress(quest, events)
             expect(res.current).toBe(2)

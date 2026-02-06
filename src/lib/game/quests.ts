@@ -37,7 +37,6 @@ const WEEKLY_TEMPLATES: QuestDefinition[] = [
 export async function ensureQuests(supabase: SupabaseClient, userId: string) {
     const today = new Date()
     const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString()
-    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString()
 
     // Check Daily Quests
     const { data: dailies } = await supabase
@@ -74,7 +73,6 @@ async function generateDailyQuests(supabase: SupabaseClient, userId: string) {
 
     const today = new Date()
     const todayStr = today.toISOString().split('T')[0]
-    const tomorrowStr = new Date(today.setDate(today.getDate() + 1)).toISOString().split('T')[0]
 
     const questsToInsert = selected.map(q => ({
         user_id: userId,
@@ -118,7 +116,16 @@ async function generateWeeklyQuests(supabase: SupabaseClient, userId: string) {
  * Evaluates quest progress based on event history.
  * Returns progress percentage (0-100) and current count.
  */
-export function evaluateQuestProgress(quest: any, events: any[]): { progress: number, current: number, target: number } {
+// Basic Event Type for engine
+type GameEvent = {
+    actions: {
+        key: string
+        category: string
+    }
+    [key: string]: any
+}
+
+export function evaluateQuestProgress(quest: { rules: any }, events: GameEvent[]): { progress: number, current: number, target: number } {
     const rules = quest.rules as QuestRule
     if (!rules) return { progress: 0, current: 0, target: 1 }
 
@@ -129,9 +136,9 @@ export function evaluateQuestProgress(quest: any, events: any[]): { progress: nu
     // Assuming events passed are already potentially valid (e.g. from Today for daily quests)
 
     if (rules.actionKey) {
-        count = events.filter((e: any) => e.actions?.key === rules.actionKey).length
+        count = events.filter((e) => e.actions?.key === rules.actionKey).length
     } else if (rules.category) {
-        count = events.filter((e: any) => e.actions?.category === rules.category).length
+        count = events.filter((e) => e.actions?.category === rules.category).length
     }
 
     return {

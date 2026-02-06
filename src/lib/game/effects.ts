@@ -17,7 +17,13 @@ export const SHOP_ITEMS = [
  * Let's go with: Streak Freeze is a "buff" that lasts until it saves a streak? No, that requires state.
  * Simplest: Consumable. "Active Until" logic works for Potions.
  */
-export function getActiveEffects(purchases: any[]) {
+interface Purchase {
+    item_key: string
+    active_until: string | null
+    [key: string]: any // For other DB fields
+}
+
+export function getActiveEffects(purchases: Purchase[]) {
     const now = new Date()
     return purchases.filter(p => p.active_until && new Date(p.active_until) > now)
 }
@@ -25,7 +31,7 @@ export function getActiveEffects(purchases: any[]) {
 /**
  * Calculates current XP multiplier based on active effects.
  */
-export function getEffectMultiplier(activeEffects: any[]): number {
+export function getEffectMultiplier(activeEffects: Purchase[]): number {
     let multiplier = 1.0
 
     // Check for XP Boosts
@@ -42,7 +48,7 @@ export function getEffectMultiplier(activeEffects: any[]): number {
  * Complex. MVP: Infinite freeze? No.
  * MVP Implementation: When calculating streak, if today is missing, check if "Streak Freeze" was purchased "yesterday" or is "active".
  */
-export function isStreakProtected(purchases: any[], missingDate: string): boolean {
+export function isStreakProtected(_purchases: Purchase[], _missingDate: string): boolean {
     // For MVP, return false. Implementation requires consumption logic.
     return false
 }

@@ -5,7 +5,7 @@ import { purchaseItem } from '@/actions/purchase-item'
 import { toast } from 'sonner'
 import { useState, useTransition } from 'react'
 
-export function PurchaseButton({ item, balance }: { item: any, balance: number }) {
+export function PurchaseButton({ item, balance }: { item: { key: string, name: string, cost: number }, balance: number }) {
     const [pending, startTransition] = useTransition()
     const canAfford = balance >= item.cost
 
