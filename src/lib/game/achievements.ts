@@ -22,7 +22,13 @@ export const ACHIEVEMENTS: AchievementDefinition[] = [
     { key: 'hustler_level_1', name: 'Starting Hustle', description: 'Reach Level 5.', icon: '💼', reward_xp: 200, reward_coin: 40, rules: { type: 'level', target: 5 } },
 ]
 
-export async function checkAchievements(supabase: SupabaseClient, userId: string, stats: any) {
+export interface UserStats {
+    totalActions: number
+    streak: number
+    level: number
+}
+
+export async function checkAchievements(supabase: SupabaseClient, userId: string, stats: UserStats) {
     // 1. Fetch unlocked achievements
     const { data: unlocked } = await supabase
         .from('user_achievements')

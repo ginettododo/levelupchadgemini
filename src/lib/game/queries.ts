@@ -51,7 +51,7 @@ export async function getDaySummary(
     // --- 1. Calculate Streak ---
     // Group events by day
     const dailyCounts: Record<string, number> = {}
-    events.forEach((e: any) => {
+    events.forEach((e: { day_key?: string, ts: string }) => {
         // e.day_key should be trusted if reliable, otherwise derive from e.ts
         const day = e.day_key || e.ts.split('T')[0]
         dailyCounts[day] = (dailyCounts[day] || 0) + 1
